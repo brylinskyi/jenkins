@@ -9,10 +9,9 @@ pipeline {
         stage('Prepare') {
             steps {
                 echo "Installing Node.js v${NODE_VERSION}..."
-                sh '''
-                  curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
-                  apt-get install -y nodejs
-                '''
+                sh "curl -fsSL https://deb.nodesource.com/setup_${env.NODE_VERSION}.x | sudo -E bash -"
+                echo "Installing Node.js"
+                sh "sudo apt-get install -y nodejs"
             }
         }
 
