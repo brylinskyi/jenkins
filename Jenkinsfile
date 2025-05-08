@@ -2,32 +2,38 @@ pipeline {
     agent any
 
     environment {
-        NODE_VERSION = '22'
+        NODE_VERSION = '22.0.0'  // specify exact version
+        NODE_DIR = "${env.WORKSPACE}/.node"
+        PATH = "${env.WORKSPACE}/.node/bin:${env.PATH}"
     }
 
     stages {
         stage('Prepare') {
             steps {
-                echo "Installing Node.js v${NODE_VERSION}..."
-                sh "curl -fsSL https://deb.nodesource.com/setup_${env.NODE_VERSION}.x | sudo -E bash -"
-                echo "Installing Node.js"
-                sh "sudo apt-get install -y nodejs"
+                echo "Installing Node.js v${NODE_VERSION} locally..."
+                sh '''
+                  mkdir -p $NODE_DIR
+                  curl -o node.tar.xz https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz
+                  tar -xf node.tar.xz
+                  mv node-v$NODE_VERSION-linux-x64/* $NODE_DIR
+                '''
+                sh 'node -v'
+                sh 'npm -v'
             }
         }
 
         stage('Build') {
             steps {
-                echo "Simulating build by showing npm version..."
+                echo "Simulating build with local npm..."
                 sh 'npm -v'
             }
         }
 
         stage('Test') {
             steps {
-                echo "Simulating test by displaying JENKINS_URL..."
+                echo "JENKINS_URL environment test..."
                 sh 'echo $JENKINS_URL'
             }
         }
     }
 }
-
